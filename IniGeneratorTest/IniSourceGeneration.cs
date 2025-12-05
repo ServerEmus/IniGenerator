@@ -49,6 +49,7 @@ public class OutSide
 
 public class MainTest
 {
+    /// <summary>aaaa aa </summary>
     public int val { get; set; } = 555;
     public string test { get; set; } = string.Empty;
 }

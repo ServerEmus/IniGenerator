@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
+using System.Xml.Linq;
 
 namespace IniGenerator;
 
@@ -194,6 +195,14 @@ internal class IniCodeGen
         foreach (var attribute in symbol.GetAttributes())
         {
             genClass.ExtractAttributeData(attribute);
+        }
+
+        genClass.Comment = string.Empty;
+        var comment = symbol.GetDocumentationCommentXml();
+        if (comment != null && comment.Contains("<summary>"))
+        {
+            var element = XElement.Parse(comment);
+            genClass.Comment = element.Descendants("summary").FirstOrDefault().Value.Trim();
         }
 
         ITypeSymbol? typeSymbol = symbol switch
