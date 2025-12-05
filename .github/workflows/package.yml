@@ -13,5 +13,3 @@ jobs:
     uses: ServerEmus/workflows/.github/workflows/package.yml@main
     with:
       ProjName: IniGenerator
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN   }}
