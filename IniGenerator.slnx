@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="IniGenerator/IniGenerator.csproj" />
+  <Project Path="IniGeneratorTest/IniGeneratorTest.csproj" />
+</Solution>
