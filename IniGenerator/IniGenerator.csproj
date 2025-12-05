@@ -31,8 +31,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all">
-			<PrivateAssets>all</PrivateAssets>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0">
+
 		</PackageReference>
 	</ItemGroup>
 	

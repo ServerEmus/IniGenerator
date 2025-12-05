@@ -108,7 +108,11 @@ internal class IniCodeGen
                     }
                     stringBuilder.AppendLine("\t\t\t},");
                 }
-                stringBuilder.AppendFormat("\t\t\tValue = data.{0}.ToString(),\n", g.OriginalKeyName);
+
+                if (g.KeyTypeSymbol?.Name == "String")
+                    stringBuilder.AppendFormat("\t\t\tValue = data.{0},\n", g.OriginalKeyName);
+                else
+                    stringBuilder.AppendFormat("\t\t\tValue = data.{0}.ToString(),\n", g.OriginalKeyName);
 
                 stringBuilder.AppendLine("\t\t});");
             }
@@ -135,9 +139,14 @@ internal class IniCodeGen
                     stringBuilder.AppendFormat("\t\tif ({0}(section.Keys[\"{1}\"], out var parsed{1}))\n", method.ToDisplayString(Extensions.CustomFormat), g.KeyName);
                     stringBuilder.AppendFormat("\t\t\tdata.{0} = parsed{1};\n", g.OriginalKeyName, g.KeyName);
                 }
+                else if (g.KeyTypeSymbol.Name == "String")
+                {
+                    stringBuilder.AppendFormat("\t\tif (section.Keys.ContainsKey(\"{0}\"))\n", g.KeyName);
+                    stringBuilder.AppendFormat("\t\t\tdata.{0} = section.Keys[\"{1}\"];\n", g.OriginalKeyName, g.KeyName);
+                }
                 else
                 {
-                    stringBuilder.AppendFormat("throw new System.Excpetion(\"Cannot convert Name:{0} KeyName:{1} TypeName:{2} Reason: Missing \"static bool TryParse(string, out T type)\" method\");\n", g.OriginalKeyName, g.KeyName, g.KeyTypeSymbol.Name);
+                    stringBuilder.AppendFormat("throw new System.Excpetion(\"Cannot convert Name:{0} KeyName:{1} TypeName:{2} Reason: Missing \\\"static bool TryParse(string, out T type)\\\" method\");\n", g.OriginalKeyName, g.KeyName, g.KeyTypeSymbol.Name);
                 }
             }
 
@@ -196,7 +205,7 @@ internal class IniCodeGen
 
         genClass.KeyTypeSymbol = typeSymbol;
 
-        if (typeSymbol?.TypeKind == TypeKind.Class)
+        if (typeSymbol is not null && typeSymbol.TypeKind == TypeKind.Class && typeSymbol.Name != "String")
         {
             TypeWork(stringBuilder, compilation, typeSymbol, genClass, ref sectionNames, symbol);
             return;

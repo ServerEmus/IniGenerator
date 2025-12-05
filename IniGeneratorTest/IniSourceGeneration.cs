@@ -9,6 +9,8 @@ public class Test
     public int val;
     public bool AcceptAll { get; set; } = true;
 
+    public string StuffHere { get; set; } = string.Empty;
+
     [GenerateIniName("MyAccept")]
     public bool AcceptAll2 { get; set; } = true;
 
@@ -45,11 +47,12 @@ public class OutSide
     public int val { get; set; } = 555;
 }
 
-public class UUUIIIUUUUAAAA
+public class MainTest
 {
     public int val { get; set; } = 555;
+    public string test { get; set; } = string.Empty;
 }
 
-[GenerateIni(typeof(UUUIIIUUUUAAAA))]
+[GenerateIni(typeof(MainTest))]
 [GenerateIni(typeof(Test))]
 public partial class IniSourceGeneration;
