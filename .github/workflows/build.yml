@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+      - '.github/*'
+      - '*.md'
+      - "*.yml"
+  pull_request:
+    paths-ignore:
+      - '.github/*'
+      - '*.md'
+      - "*.yml"
+  workflow_dispatch:
+    # allow manual trigger
+
+jobs:
+  build:
+    permissions:
+      packages: read
+      contents: read
+    uses: ServerEmus/workflows/.github/workflows/build.yml@main
+    with:
+      ProjName: IniGenerator
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN   }}

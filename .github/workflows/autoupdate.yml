@@ -1,0 +1,18 @@
+name: Auto Update Packages
+
+on:
+  schedule:
+  - cron:  '0 15 * * 0'
+  workflow_dispatch:
+    # allow manual trigger
+
+jobs:
+  autoupdate:
+    permissions:
+      contents: write
+      packages: write
+    uses: ServerEmus/workflows/.github/workflows/autoupdate.yml@main
+    with:
+      runner: ubuntu-latest
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
