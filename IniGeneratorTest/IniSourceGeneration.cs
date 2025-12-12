@@ -54,6 +54,12 @@ public class MainTest
     public string test { get; set; } = string.Empty;
 }
 
+public class ListTest
+{
+    public List<int> TestList { get; set; } = [];
+}
+
 [GenerateIni(typeof(MainTest))]
 [GenerateIni(typeof(Test))]
+[GenerateIni(typeof(ListTest))]
 public partial class IniSourceGeneration;

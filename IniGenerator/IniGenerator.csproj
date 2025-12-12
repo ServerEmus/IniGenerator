@@ -9,7 +9,7 @@
 	<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	<IsRoslynComponent>true</IsRoslynComponent>
 
-	<Version>0.0.3</Version>
+	<Version>0.0.4</Version>
 	<Title>Generating IniData parsing and reading.</Title>
 	<Authors>ServerEmus</Authors>
 	<Description>$(Title)</Description>
