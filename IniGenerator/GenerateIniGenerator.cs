@@ -6,7 +6,7 @@ using System.Text;
 
 namespace IniGenerator;
 
-[Generator(LanguageNames.CSharp)]
+[Generator]
 public class GenerateIniGenerator : IIncrementalGenerator
 {
 

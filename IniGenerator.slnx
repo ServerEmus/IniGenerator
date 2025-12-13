@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="IniGenerator/IniGenerator.csproj" />
   <Project Path="IniGeneratorTest/IniGeneratorTest.csproj" />
+  <Project Path="SampleApp/SampleApp.csproj" Id="d9b623df-c8eb-44bf-8d72-fc075c75b398" />
 </Solution>

@@ -59,7 +59,8 @@ internal class IniCodeGen
         // ICollection<T> types stuff
         if (type.Interfaces.Any(intf => intf.IsGenericType && intf.Name == "ICollection" && intf.ContainingNamespace != null && intf.ContainingNamespace.Name == "Generic"))
         {
-            ListWork(stringBuilder, compilation, type, typeGenRelated, sectionName, ref sectionNames, fromSymbol);
+            ListWork(stringBuilder, compilation, type, typeGenRelated, sectionName);
+            DictWork(stringBuilder, compilation, type, typeGenRelated, sectionName);
 
             sectionNames.Add(new()
             {
@@ -74,12 +75,12 @@ internal class IniCodeGen
         {
             if (member is IFieldSymbol field)
             {
-                FieldWork(stringBuilder, compilation, field, fromSymbol, ref SectionGenerateList, ref sectionNames);
+                FieldWork(stringBuilder, compilation, field, ref SectionGenerateList, ref sectionNames);
             }
 
             if (member is IPropertySymbol property)
             {
-                PropertyWork(stringBuilder, compilation, property, fromSymbol, ref SectionGenerateList, ref sectionNames);
+                PropertyWork(stringBuilder, compilation, property, ref SectionGenerateList, ref sectionNames);
             }
         }
 
@@ -171,7 +172,6 @@ internal class IniCodeGen
     }
 
     private static void FieldWork(StringBuilder stringBuilder, Compilation compilation, IFieldSymbol field,
-        ISymbol fromSymbol,
         ref List<IniGenClass> generateList, ref List<MainIniWork> sectionNames)
     {
         if (field.IsConst)
@@ -183,21 +183,19 @@ internal class IniCodeGen
         if (field.Name.StartsWith("<"))
             return;
 
-        SymbolWork(stringBuilder, compilation, field, fromSymbol, ref generateList, ref sectionNames);
+        SymbolWork(stringBuilder, compilation, field, ref generateList, ref sectionNames);
     }
 
     private static void PropertyWork(StringBuilder stringBuilder, Compilation compilation, IPropertySymbol property,
-        ISymbol fromSymbol,
         ref List<IniGenClass> generateList, ref List<MainIniWork> sectionNames)
     {
         if (property.IsStatic)
             return;
 
-        SymbolWork(stringBuilder, compilation, property, fromSymbol, ref generateList, ref sectionNames);
+        SymbolWork(stringBuilder, compilation, property, ref generateList, ref sectionNames);
     }
 
     private static void SymbolWork(StringBuilder stringBuilder, Compilation compilation, ISymbol symbol,
-        ISymbol fromSymbol,
         ref List<IniGenClass> generateList, ref List<MainIniWork> sectionNames)
     {
         IniGenClass genClass = new()
@@ -211,12 +209,11 @@ internal class IniCodeGen
             genClass.ExtractAttributeData(attribute);
         }
 
-        genClass.Comment = string.Empty;
         var comment = symbol.GetDocumentationCommentXml();
         if (comment != null && comment.Contains("<summary>"))
         {
             var element = XElement.Parse(comment);
-            genClass.Comment = element.Descendants("summary").FirstOrDefault().Value.Trim();
+            genClass.Comment += "\n" + element.Descendants("summary").FirstOrDefault().Value.Trim();
         }
 
         ITypeSymbol? typeSymbol = symbol switch
@@ -238,17 +235,11 @@ internal class IniCodeGen
             generateList.Add(genClass);
     }
 
-    private static void ListWork(StringBuilder stringBuilder, Compilation compilation, ITypeSymbol type, IniGenClass typeGenRelated, string sectionName,
-        ref List<MainIniWork> sectionNames, ISymbol fromSymbol)
+    private static void ListWork(StringBuilder stringBuilder, Compilation compilation, ITypeSymbol type, IniGenClass typeGenRelated, string sectionName)
     {
         ITypeSymbol Type;
         if (type is not INamedTypeSymbol namedTypeSymbol)
             return;
-        stringBuilder.AppendFormat("// c: {0}\n", namedTypeSymbol.TypeArguments);
-        foreach (var symbol in namedTypeSymbol.TypeArguments)
-        {
-            stringBuilder.AppendFormat("// {0}", symbol.Name);
-        }
 
         if (namedTypeSymbol.TypeArguments.Length != 1)
             return;
@@ -266,6 +257,17 @@ internal class IniCodeGen
         stringBuilder.AppendLine("\t\t{");
         stringBuilder.AppendLine("\t\t\tsectionData.Keys.SetKeyData(new(i.ToString())");
         stringBuilder.AppendLine("\t\t\t{");
+        if (!string.IsNullOrEmpty(typeGenRelated.Comment))
+        {
+            var comments = typeGenRelated.Comment.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
+            stringBuilder.AppendLine("\t\t\t\tComments = ");
+            stringBuilder.AppendLine("\t\t\t\t{");
+            foreach (var comment in comments)
+            {
+                stringBuilder.AppendFormat("\t\t\t\t\t\"{0}\",\n", comment.Trim());
+            }
+            stringBuilder.AppendLine("\t\t\t\t},");
+        }
         stringBuilder.AppendFormat("\t\t\t\tValue = data[i]{0},\n", isStringType ? string.Empty : ".ToString()");
         stringBuilder.AppendLine("\t\t\t});");
         stringBuilder.AppendLine("\t\t}");
@@ -280,7 +282,7 @@ internal class IniCodeGen
         stringBuilder.AppendLine("\t\tforeach (var key in section.Keys)");
         stringBuilder.AppendLine("\t\t{");
         if (isStringType)
-            stringBuilder.AppendLine("\t\t\tvar item = key.Value;");
+            stringBuilder.AppendLine("\t\t\tdata.Add(key.Value);");
         else
         {
             var method = Extensions.FindTryParseMethod(Type, compilation);
@@ -288,24 +290,120 @@ internal class IniCodeGen
             {
                 stringBuilder.AppendFormat("\t\t\tif (!{0}(key.Value, out var parsed))\n", method.ToDisplayString(Extensions.CustomFormat));
                 stringBuilder.AppendLine("\t\t\t\tcontinue;");
-                stringBuilder.AppendLine("\t\t\tvar item = parsed;");
+                stringBuilder.AppendLine("\t\t\tdata.Add(parsed);");
             }
             else
             {
                 stringBuilder.AppendFormat("throw new System.Excpetion(\"Cannot convert TypeName:{0} Reason: Missing \\\"static bool TryParse(string, out T type)\\\" method\");\n",Type.Name);
             }
         }
-            
-        stringBuilder.AppendLine("\t\t\tdata.Add(item);");
+              
         stringBuilder.AppendLine("\t\t}");
         stringBuilder.AppendLine("\t}");
+    }
+
+    private static void DictWork(StringBuilder stringBuilder, Compilation compilation, ITypeSymbol type, IniGenClass typeGenRelated, string sectionName)
+    {
+        if (type is not INamedTypeSymbol namedTypeSymbol)
+            return;
+
+        if (namedTypeSymbol.TypeArguments.Length != 2)
+            return;
+
+        ITypeSymbol FirstType = namedTypeSymbol.TypeArguments[0];
+        ITypeSymbol SecondType = namedTypeSymbol.TypeArguments[1];
+
+        // Write Dict
+        stringBuilder.AppendLine();
+        stringBuilder.AppendFormat("\tpublic static SectionData Write{0}Section({1} data)\n", sectionName, type.ToDisplayString(Extensions.CustomFormat));
+        stringBuilder.AppendLine("\t{");
+        stringBuilder.AppendFormat("\t\tSectionData sectionData = new SectionData(\"{0}\");\n", sectionName);
+        stringBuilder.AppendLine("\t\tforeach (var item in data)");
+        stringBuilder.AppendLine("\t\t{");
+        stringBuilder.AppendFormat("\t\t\tsectionData.Keys.SetKeyData(new(item.Key{0})\n", FirstType.Name == "String" ? string.Empty : ".ToString()");
+        stringBuilder.AppendLine("\t\t\t{");
+        if (!string.IsNullOrEmpty(typeGenRelated.Comment))
+        {
+            var comments = typeGenRelated.Comment.Split(['\n'], StringSplitOptions.RemoveEmptyEntries);
+            stringBuilder.AppendLine("\t\t\t\tComments = ");
+            stringBuilder.AppendLine("\t\t\t\t{");
+            foreach (var comment in comments)
+            {
+                stringBuilder.AppendFormat("\t\t\t\t\t\"{0}\",\n", comment.Trim());
+            }
+            stringBuilder.AppendLine("\t\t\t\t},");
+        }
+        stringBuilder.AppendFormat("\t\t\t\tValue = item.Value{0},\n", SecondType.Name == "String" ? string.Empty : ".ToString()");
+        stringBuilder.AppendLine("\t\t\t});");
+        stringBuilder.AppendLine("\t\t}");
+        stringBuilder.AppendLine("\t\treturn sectionData;");
+        stringBuilder.AppendLine("\t}");
+
+
+        // Read Dict
+        stringBuilder.AppendLine();
+        stringBuilder.AppendFormat("\tpublic static void Read{0}Section({1} data, SectionData section)\n", sectionName, type.ToDisplayString(Extensions.CustomFormat));
+        stringBuilder.AppendLine("\t{");
+        stringBuilder.AppendLine("\t\tif (section == null) return;");
+        stringBuilder.AppendLine("\t\tforeach (var key in section.Keys)");
+        stringBuilder.AppendLine("\t\t{");
+
 
         /*
-                foreach (var key in sectionData.Keys)
+                foreach (var key in section.Keys)
         {
-            string item = key.Value;
-            testList.Add(item);
+            var dataKey = key.KeyName;
+            var item = key.Value;
+            data.Add(dataKey, item);
         }
         */
+        if (FirstType.Name == "String" && SecondType.Name == "String")
+            stringBuilder.AppendLine("\t\t\tdata.Add(key.KeyName, key.Value);");
+        else
+        {
+
+            // Key name parse
+            if (FirstType.Name != "String")
+            {
+                var method = Extensions.FindTryParseMethod(FirstType, compilation);
+                if (method != null)
+                {
+                    stringBuilder.AppendFormat("\t\t\tif (!{0}(key.KeyName, out var dataKey))\n", method.ToDisplayString(Extensions.CustomFormat));
+                    stringBuilder.AppendLine("\t\t\t\tcontinue;");
+                }
+                else
+                {
+                    stringBuilder.AppendFormat("throw new System.Excpetion(\"Cannot convert First TypeName:{0} Reason: Missing \\\"static bool TryParse(string, out T type)\\\" method\");\n", FirstType.Name);
+                }
+            }
+            else
+            {
+                stringBuilder.AppendLine("\t\t\tvar dataKey = key.KeyName;");
+            }
+
+            // Key value parse
+            if (SecondType.Name != "String")
+            {
+                var method = Extensions.FindTryParseMethod(SecondType, compilation);
+                if (method != null)
+                {
+                    stringBuilder.AppendFormat("\t\t\tif (!{0}(key.Value, out var value))\n", method.ToDisplayString(Extensions.CustomFormat));
+                    stringBuilder.AppendLine("\t\t\t\tcontinue;");
+                }
+                else
+                {
+                    stringBuilder.AppendFormat("throw new System.Excpetion(\"Cannot convert Second TypeName:{0} Reason: Missing \\\"static bool TryParse(string, out T type)\\\" method\");\n", SecondType.Name);
+                }
+            }
+            else
+            {
+                stringBuilder.AppendLine("\t\t\tvar value = key.Value;");
+            }
+
+            stringBuilder.AppendLine("\t\t\tdata.Add(dataKey, value);");
+        }
+
+        stringBuilder.AppendLine("\t\t}");
+        stringBuilder.AppendLine("\t}");
     }
 }
