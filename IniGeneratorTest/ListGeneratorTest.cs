@@ -36,7 +36,7 @@ public class ListGeneratorTest
         	    SectionData sectionData = new SectionData("MyList");
         	    for (int i = 0; i < data.Count; i++)
         	    {
-        		    sectionData.Keys.SetKeyData(new(i.ToString())
+        		    sectionData.Keys.SetKeyData(new KeyData(i.ToString())
         		    {
         			    Value = data[i],
         		    });

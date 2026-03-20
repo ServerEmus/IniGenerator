@@ -36,7 +36,7 @@ public class DictGeneratorTest
         	    SectionData sectionData = new SectionData("MyDict");
         	    foreach (var item in data)
         	    {
-        		    sectionData.Keys.SetKeyData(new(item.Key.ToString())
+        		    sectionData.Keys.SetKeyData(new KeyData(item.Key.ToString())
         		    {
         			    Value = item.Value,
         		    });
