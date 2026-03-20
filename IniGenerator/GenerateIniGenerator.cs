@@ -79,7 +79,7 @@ public class GenerateIniGenerator : IIncrementalGenerator
                 stringBuilder.AppendLine();
 
                 if (!string.IsNullOrEmpty(data.Namespace))
-                    stringBuilder.AppendLine($"namespace {data.Namespace};");
+                    stringBuilder.AppendLine($"namespace {data.Namespace} {{");
 
                 stringBuilder.AppendLine();
 
@@ -89,6 +89,9 @@ public class GenerateIniGenerator : IIncrementalGenerator
                 IniCodeGen.MainIniCodeGenWork(stringBuilder, compilation, typeSymbol);
 
                 stringBuilder.AppendLine("}");
+
+                if (!string.IsNullOrEmpty(data.Namespace))
+                    stringBuilder.AppendLine("}");
 
                 ctx.AddSource($"{data.ClassName}_{typeSymbol.Name}.g.cs", stringBuilder.ToString());
             }

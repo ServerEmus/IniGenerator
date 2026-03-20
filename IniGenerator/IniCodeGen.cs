@@ -1,6 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using System.ComponentModel;
 using System.Text;
 using System.Xml.Linq;
 
@@ -180,7 +178,7 @@ internal class IniCodeGen
         if (field.IsStatic)
             return;
 
-        if (field.Name.StartsWith("<"))
+        if (field.IsImplicitlyDeclared)
             return;
 
         SymbolWork(stringBuilder, compilation, field, ref generateList, ref sectionNames);
@@ -255,7 +253,7 @@ internal class IniCodeGen
         stringBuilder.AppendFormat("\t\tSectionData sectionData = new SectionData(\"{0}\");\n", sectionName);
         stringBuilder.AppendLine("\t\tfor (int i = 0; i < data.Count; i++)");
         stringBuilder.AppendLine("\t\t{");
-        stringBuilder.AppendLine("\t\t\tsectionData.Keys.SetKeyData(new(i.ToString())");
+        stringBuilder.AppendLine("\t\t\tsectionData.Keys.SetKeyData(new KeyData(i.ToString())");
         stringBuilder.AppendLine("\t\t\t{");
         if (!string.IsNullOrEmpty(typeGenRelated.Comment))
         {
@@ -320,7 +318,7 @@ internal class IniCodeGen
         stringBuilder.AppendFormat("\t\tSectionData sectionData = new SectionData(\"{0}\");\n", sectionName);
         stringBuilder.AppendLine("\t\tforeach (var item in data)");
         stringBuilder.AppendLine("\t\t{");
-        stringBuilder.AppendFormat("\t\t\tsectionData.Keys.SetKeyData(new(item.Key{0})\n", FirstType.Name == "String" ? string.Empty : ".ToString()");
+        stringBuilder.AppendFormat("\t\t\tsectionData.Keys.SetKeyData(new KeyData(item.Key{0})\n", FirstType.Name == "String" ? string.Empty : ".ToString()");
         stringBuilder.AppendLine("\t\t\t{");
         if (!string.IsNullOrEmpty(typeGenRelated.Comment))
         {

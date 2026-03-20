@@ -32,7 +32,7 @@ public class SubClassGeneratorTest
         using IniParser;
         using IniParser.Model;
 
-        namespace IniGeneratorTest;
+        namespace IniGeneratorTest {
 
         partial class SubClassTestSourceGenerator
         {
@@ -85,6 +85,7 @@ public class SubClassGeneratorTest
         	    ReadClassSection(data.Class, iniData.Sections.GetSectionData("Class"));
             }
         }
+        }
 
         """;
 
@@ -94,16 +95,16 @@ public class SubClassGeneratorTest
         CSharpGeneratorDriver driver = CSharpGeneratorDriver.Create([new GenerateIniAttributeGenerator(), new GenerateIniGenerator()]);
 
         Compilation compilation = CSharpCompilation.Create(nameof(GenerateIniGenerator),
-            [CSharpSyntaxTree.ParseText(SourceClassTest)],
+            [CSharpSyntaxTree.ParseText(SourceClassTest, cancellationToken: TestContext.Current.CancellationToken)],
             [
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
             ]);
 
-        GeneratorDriverRunResult runResult = driver.RunGenerators(compilation).GetRunResult();
+        GeneratorDriverRunResult runResult = driver.RunGenerators(compilation, cancellationToken: TestContext.Current.CancellationToken).GetRunResult();
 
         SyntaxTree generatedFileSyntax = runResult.GeneratedTrees.Single(t => t.FilePath.EndsWith(ExpectedGeneratedFileName));
 
-        Assert.Equal(ExpectedGenerated, generatedFileSyntax.GetText().ToString(),
+        Assert.Equal(ExpectedGenerated, generatedFileSyntax.GetText(cancellationToken: TestContext.Current.CancellationToken).ToString(),
             ignoreLineEndingDifferences: true,
             ignoreAllWhiteSpace: true);
     }
