@@ -76,22 +76,22 @@ public class GenerateIniGenerator : IIncrementalGenerator
                 stringBuilder.AppendLine("using IniParser;");
                 stringBuilder.AppendLine("using IniParser.Model;");
 
-                stringBuilder.AppendLine();
-
                 if (!string.IsNullOrEmpty(data.Namespace))
-                    stringBuilder.AppendLine($"namespace {data.Namespace} {{");
+                {
+                    stringBuilder.Append($"\nnamespace {data.Namespace}\n{{");
+                }
 
                 stringBuilder.AppendLine();
 
-                stringBuilder.AppendLine($"partial class {data.ClassName}");
-                stringBuilder.AppendLine("{");
+                stringBuilder.Append($"\npartial class {data.ClassName}");
+                stringBuilder.Append("\n{");
 
                 IniCodeGen.MainIniCodeGenWork(stringBuilder, compilation, typeSymbol);
 
-                stringBuilder.AppendLine("}");
+                stringBuilder.Append("\n}");
 
                 if (!string.IsNullOrEmpty(data.Namespace))
-                    stringBuilder.AppendLine("}");
+                    stringBuilder.Append("\n}");
 
                 ctx.AddSource($"{data.ClassName}_{typeSymbol.Name}.g.cs", stringBuilder.ToString());
             }

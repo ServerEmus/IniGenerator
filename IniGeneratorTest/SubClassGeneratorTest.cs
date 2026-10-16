@@ -32,11 +32,12 @@ public class SubClassGeneratorTest
         using IniParser;
         using IniParser.Model;
 
-        namespace IniGeneratorTest {
+        namespace IniGeneratorTest
+        {
 
         partial class SubClassTestSourceGenerator
         {
-
+        	/// <summary>Writes Class section.</summary><param name="data">The data.</param><returns>The section.</returns>
             public static SectionData WriteClassSection(IniGeneratorTest.SubClassTest.MyClass data)
             {
         	    SectionData sectionData = new SectionData("Class");
@@ -47,6 +48,7 @@ public class SubClassGeneratorTest
         	    return sectionData;
             }
 
+        	/// <summary>Reads Class section.</summary><param name="data">The data.</param><param name="section">The ini section.</param>
             public static void ReadClassSection(IniGeneratorTest.SubClassTest.MyClass data, SectionData section)
             {
         	    if (section == null) return;
@@ -54,6 +56,7 @@ public class SubClassGeneratorTest
         		    data.Name = section.Keys["Name"];
             }
 
+        	/// <summary>Writes ExtraClassName section.</summary><param name="data">The data.</param><returns>The section.</returns>
             public static SectionData WriteExtraClassNameSection(IniGeneratorTest.SubClassTest.MyClass data)
             {
         	    SectionData sectionData = new SectionData("ExtraClassName");
@@ -64,6 +67,7 @@ public class SubClassGeneratorTest
         	    return sectionData;
             }
 
+        	/// <summary>Reads ExtraClassName section.</summary><param name="data">The data.</param><param name="section">The ini section.</param>
             public static void ReadExtraClassNameSection(IniGeneratorTest.SubClassTest.MyClass data, SectionData section)
             {
         	    if (section == null) return;
@@ -71,6 +75,7 @@ public class SubClassGeneratorTest
         		    data.Name = section.Keys["Name"];
             }
 
+        	/// <summary>Writes SubClassTest ini data.</summary><param name="data">The data.</param><returns>The ini data.</returns>
             public static IniData WriteSubClassTestIniData(IniGeneratorTest.SubClassTest data)
             {
         	    IniData iniData = new IniData();
@@ -79,14 +84,15 @@ public class SubClassGeneratorTest
         	    return iniData;
             }
 
+        	/// <summary>Reads SubClassTest ini data.</summary><param name="data">The data.</param><param name="iniData">The ini data.</param>
             public static void ReadSubClassTestIniData(IniGeneratorTest.SubClassTest data, IniData iniData)
             {
         	    ReadExtraClassNameSection(data.Class2, iniData.Sections.GetSectionData("ExtraClassName"));
         	    ReadClassSection(data.Class, iniData.Sections.GetSectionData("Class"));
             }
-        }
-        }
 
+        }
+        }
         """;
 
     [Fact]

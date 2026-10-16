@@ -26,11 +26,12 @@ public class DictGeneratorTest
         using IniParser;
         using IniParser.Model;
 
-        namespace IniGeneratorTest {
+        namespace IniGeneratorTest
+        {
 
         partial class DictTestSourceGenerator
         {
-        
+        	/// <summary>Writes MyDict section.</summary><param name="data">The data.</param><returns>The section.</returns>
             public static SectionData WriteMyDictSection(System.Collections.Generic.Dictionary<System.Int32, System.String> data)
             {
         	    SectionData sectionData = new SectionData("MyDict");
@@ -44,6 +45,7 @@ public class DictGeneratorTest
         	    return sectionData;
             }
 
+        	/// <summary>Reads MyDict section.</summary><param name="data">The data.</param><param name="section">The ini section.</param>
             public static void ReadMyDictSection(System.Collections.Generic.Dictionary<System.Int32, System.String> data, SectionData section)
             {
         	    if (section == null) return;
@@ -56,6 +58,7 @@ public class DictGeneratorTest
         	    }
             }
 
+        	/// <summary>Writes DictTest ini data.</summary><param name="data">The data.</param><returns>The ini data.</returns>
             public static IniData WriteDictTestIniData(IniGeneratorTest.DictTest data)
             {
         	    IniData iniData = new IniData();
@@ -63,13 +66,14 @@ public class DictGeneratorTest
         	    return iniData;
             }
 
+        	/// <summary>Reads DictTest ini data.</summary><param name="data">The data.</param><param name="iniData">The ini data.</param>
             public static void ReadDictTestIniData(IniGeneratorTest.DictTest data, IniData iniData)
             {
         	    ReadMyDictSection(data.MyDict, iniData.Sections.GetSectionData("MyDict"));
             }
-        }
-        }
 
+        }
+        }
         """;
 
     [Fact]

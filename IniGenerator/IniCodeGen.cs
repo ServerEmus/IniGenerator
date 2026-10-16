@@ -22,6 +22,7 @@ internal class IniCodeGen
         // Write Ini.
         stringBuilder.AppendLine();
 
+        stringBuilder.AppendFormat("\t/// <summary>Writes {0} ini data.</summary><param name=\"data\">The data.</param><returns>The ini data.</returns>\n", type.Name);
         stringBuilder.AppendFormat("\tpublic static IniData Write{0}IniData({1} data)\n", type.Name, type.ToDisplayString(Extensions.CustomFormat));
         stringBuilder.AppendLine("\t{");
         stringBuilder.AppendLine("\t\tIniData iniData = new IniData();");
@@ -37,6 +38,7 @@ internal class IniCodeGen
         // Read Ini.
         stringBuilder.AppendLine();
 
+        stringBuilder.AppendFormat("\t/// <summary>Reads {0} ini data.</summary><param name=\"data\">The data.</param><param name=\"iniData\">The ini data.</param>\n", type.Name);
         stringBuilder.AppendFormat("\tpublic static void Read{0}IniData({1} data, IniData iniData)\n", type.Name, type.ToDisplayString(Extensions.CustomFormat));
         stringBuilder.AppendLine("\t{");
         foreach(var section in sectionNames)
@@ -102,6 +104,7 @@ internal class IniCodeGen
         foreach (var genClass in SectionGenerateList.GroupBy(g => g.SectionName))
         {
             stringBuilder.AppendLine();
+            stringBuilder.AppendFormat("\t/// <summary>Writes {0} section.</summary><param name=\"data\">The data.</param><returns>The section.</returns>\n", genClass.Key);
             stringBuilder.AppendFormat("\tpublic static SectionData Write{0}Section({1} data)\n", genClass.Key, type.ToDisplayString(Extensions.CustomFormat));
             stringBuilder.AppendLine("\t{");
 
@@ -139,6 +142,7 @@ internal class IniCodeGen
         foreach (var genClass in SectionGenerateList.GroupBy(g => g.SectionName))
         {
             stringBuilder.AppendLine();
+            stringBuilder.AppendFormat("\t/// <summary>Reads {0} section.</summary><param name=\"data\">The data.</param><param name=\"section\">The ini section.</param>\n", genClass.Key);
             stringBuilder.AppendFormat("\tpublic static void Read{0}Section({1} data, SectionData section)\n", genClass.Key, type.ToDisplayString(Extensions.CustomFormat));
             stringBuilder.AppendLine("\t{");
             stringBuilder.AppendLine("\t\tif (section == null) return;");
@@ -247,6 +251,7 @@ internal class IniCodeGen
 
         // Write List
         stringBuilder.AppendLine();
+        stringBuilder.AppendFormat("\t/// <summary>Writes {0} section.</summary><param name=\"data\">The data.</param><returns>The section.</returns>\n", sectionName);
         stringBuilder.AppendFormat("\tpublic static SectionData Write{0}Section({1} data)\n", sectionName, type.ToDisplayString(Extensions.CustomFormat));
         stringBuilder.AppendLine("\t{");
 
@@ -274,6 +279,7 @@ internal class IniCodeGen
 
         // Read List
         stringBuilder.AppendLine();
+        stringBuilder.AppendFormat("\t/// <summary>Reads {0} section.</summary><param name=\"data\">The data.</param><param name=\"section\">The ini section.</param>\n", sectionName);
         stringBuilder.AppendFormat("\tpublic static void Read{0}Section({1} data, SectionData section)\n", sectionName, type.ToDisplayString(Extensions.CustomFormat));
         stringBuilder.AppendLine("\t{");
         stringBuilder.AppendLine("\t\tif (section == null) return;");
@@ -313,6 +319,7 @@ internal class IniCodeGen
 
         // Write Dict
         stringBuilder.AppendLine();
+        stringBuilder.AppendFormat("\t/// <summary>Writes {0} section.</summary><param name=\"data\">The data.</param><returns>The section.</returns>\n", sectionName);
         stringBuilder.AppendFormat("\tpublic static SectionData Write{0}Section({1} data)\n", sectionName, type.ToDisplayString(Extensions.CustomFormat));
         stringBuilder.AppendLine("\t{");
         stringBuilder.AppendFormat("\t\tSectionData sectionData = new SectionData(\"{0}\");\n", sectionName);
@@ -340,6 +347,7 @@ internal class IniCodeGen
 
         // Read Dict
         stringBuilder.AppendLine();
+        stringBuilder.AppendFormat("\t/// <summary>Reads {0} section.</summary><param name=\"data\">The data.</param><param name=\"section\">The ini section.</param>\n", sectionName);
         stringBuilder.AppendFormat("\tpublic static void Read{0}Section({1} data, SectionData section)\n", sectionName, type.ToDisplayString(Extensions.CustomFormat));
         stringBuilder.AppendLine("\t{");
         stringBuilder.AppendLine("\t\tif (section == null) return;");

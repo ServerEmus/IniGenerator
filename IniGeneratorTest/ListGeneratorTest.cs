@@ -26,11 +26,12 @@ public class ListGeneratorTest
         using IniParser;
         using IniParser.Model;
 
-        namespace IniGeneratorTest {
+        namespace IniGeneratorTest
+        {
 
         partial class ListTestSourceGenerator
         {
-        
+        	/// <summary>Writes MyList section.</summary><param name="data">The data.</param><returns>The section.</returns>
             public static SectionData WriteMyListSection(System.Collections.Generic.List<System.String> data)
             {
         	    SectionData sectionData = new SectionData("MyList");
@@ -44,6 +45,7 @@ public class ListGeneratorTest
         	    return sectionData;
             }
 
+        	/// <summary>Reads MyList section.</summary><param name="data">The data.</param><param name="section">The ini section.</param>
             public static void ReadMyListSection(System.Collections.Generic.List<System.String> data, SectionData section)
             {
         	    if (section == null) return;
@@ -53,20 +55,22 @@ public class ListGeneratorTest
         	    }
             }
 
+        	/// <summary>Writes ListTest ini data.</summary><param name="data">The data.</param><returns>The ini data.</returns>
             public static IniData WriteListTestIniData(IniGeneratorTest.ListTest data)
             {
         	    IniData iniData = new IniData();
         	    iniData.Sections.Add(WriteMyListSection(data.MyList));
         	    return iniData;
             }
-
+        
+        	/// <summary>Reads ListTest ini data.</summary><param name="data">The data.</param><param name="iniData">The ini data.</param>
             public static void ReadListTestIniData(IniGeneratorTest.ListTest data, IniData iniData)
             {
         	    ReadMyListSection(data.MyList, iniData.Sections.GetSectionData("MyList"));
             }
-        }
-        }
 
+        }
+        }
         """;
 
     [Fact]

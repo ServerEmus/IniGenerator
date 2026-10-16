@@ -34,11 +34,12 @@ public class AllBasicTypesGeneratorTest
         using IniParser;
         using IniParser.Model;
 
-        namespace IniGeneratorTest {
+        namespace IniGeneratorTest
+        {
 
         partial class AllBasicTypesSourceGenerator
         {
-
+        	/// <summary>Writes AllBasicTypes section.</summary><param name="data">The data.</param><returns>The section.</returns>
         	public static SectionData WriteAllBasicTypesSection(IniGeneratorTest.AllBasicTypes data)
         	{
         		SectionData sectionData = new SectionData("AllBasicTypes");
@@ -81,6 +82,7 @@ public class AllBasicTypesGeneratorTest
         		return sectionData;
         	}
 
+        	/// <summary>Reads AllBasicTypes section.</summary><param name="data">The data.</param><param name="section">The ini section.</param>
         	public static void ReadAllBasicTypesSection(IniGeneratorTest.AllBasicTypes data, SectionData section)
         	{
         		if (section == null) return;
@@ -104,6 +106,7 @@ public class AllBasicTypesGeneratorTest
         			data.StringType = section.Keys["StringType"];
         	}
 
+        	/// <summary>Writes AllBasicTypes ini data.</summary><param name="data">The data.</param><returns>The ini data.</returns>
         	public static IniData WriteAllBasicTypesIniData(IniGeneratorTest.AllBasicTypes data)
         	{
         		IniData iniData = new IniData();
@@ -111,13 +114,14 @@ public class AllBasicTypesGeneratorTest
         		return iniData;
         	}
 
+        	/// <summary>Reads AllBasicTypes ini data.</summary><param name="data">The data.</param><param name="iniData">The ini data.</param>
         	public static void ReadAllBasicTypesIniData(IniGeneratorTest.AllBasicTypes data, IniData iniData)
         	{
         		ReadAllBasicTypesSection(data, iniData.Sections.GetSectionData("AllBasicTypes"));
         	}
-        }
-        }
 
+        }
+        }
         """;
 
     [Fact]
